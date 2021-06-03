@@ -97,10 +97,23 @@ MPC online control problem enhanced in CasADi, a framework written by \citet{And
 \subsection{Vehicle model}
 
 %\textcolor{gray}{\lipsum[3]}
+\subsection{MPC Model}
+In order to build an MPC internal model with its own dynamics, and which is as simple as possible, a point mass model is chosen. 
+This model has 5 DOF and encloses in itself the fundamental parameters of the driven vehicle as mass, aerodynamic coefficients, grip and power limits for braking and traction phases.
+With this MPC internal model, the optimal control problem is formulated in order to find the optimal control sequence necessary to minimize the travel time of the next N meters of the track. In particular the control inputs of the point mass model are the total longitudinal force $F_{x}$, and the angular acceleration along the $z$-axes $r_p = dr/dt$, where $r$ is the yaw rate.
+The point mass model dynamics is then formulated in spatial domain instead of the time one, and the \textit{direct collocation} is used to transform the OCP into an NLP. The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework~\cite{Andersson2019}, which provides building
+blocks to efficiently formulate and solve large-scale optimization problems, and solved through IPOPT \textbf{cita ipopt}.
 
-\subsection{Spatial formulation}
+Once the problem is solved an optimal control sequence for the steering angle has to be extracted from the NLP solution. In order to do that we use the following formula
+\begin{equation}
+\delta = \alpha_{1} + \beta_1 = Fy_{11}/C_f + (v + ra_1)/u
+\end{equation}
+where $C_f$ is the cornering stiffness of the front tire, $a_1$ is the distance between the CoM and the front axle, and we assume that the tire slip angles and the vehicle slip angles are equal for the wheels of the same axle, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and  $\beta_{11} = \beta_{12} = \beta_{1}$. 
+Furthermore, the lateral force of the front wheels are extimated with a steady state assumption in a way that $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$, where $F_{y}$ is the total lateral force acting on the point mass model, available from the NLP solution, $a_2$ is the distance between the CoM and the rear axle and $l$ is the wheelbase.
 
-The race track, assumed planar, is modelled through the parametric 2D curve
+
+
+For what concern the race track, it is assumed planar and modelled through the parametric 2D curve
 \begin{equation}
 \mathcal C(\alpha) = \{ \vec x (\alpha) = [x(\alpha), y(\alpha)]^T \in \mathbb{R}^2 : \alpha \in [\alpha_0, \alpha_f] \}
 \end{equation}
@@ -112,37 +125,44 @@ The vehicle reference system $\mathcal V = \{ \vec G, (\vec i, \vec j) \}$ can b
 % = \psi_f - \psi_v
 In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Serret system has to proceed together with the vehicle: this leads to a relation between vehicle and Frenet-Serret velocities that ultimately imposes a bound between time and $\alpha$ increments.
 
-The final formulation of the vehicle model dynamics, % TODO: ref to standard formulation, if previously exposed
-extended with lateral displacement, heading error and transposed in spatial domain is
-
-\begin{equation} \left\{
-\begin{aligned}
-  u_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ \frac{1}{m} (F_{x_1} - F_{y_1} \delta + F_{x_2} - X_a) + vr \right] \\
-  v_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ \frac{1}{m} (F_{x_1} \delta + F_{y_1} + F_{y_2}) - ur \right] \\
-  r_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ \frac{1}{I_{zz}} (F_{x_1} a_1 \delta + F_{y_1} a_1 - F_{y_2} a_2) \right] \\
-  e_{p,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ u \sin{e_\psi} + v \cos{e_\psi} \right] \\
-  e_{\psi,\alpha} &= \norm{\hat{\vec x}_{,\alpha}} \left( \frac{r}{s_p} - k \right),
-\end{aligned} \right.
-\label{eq:vehicle_state_update_alpha_domain}
-\end{equation}
+%The final formulation of the vehicle model dynamics, % TODO: ref to standard formulation, if previously exposed
+%extended with lateral displacement, heading error and transposed in spatial domain is
 %
-where the notation $u_{,\alpha} = \frac{du}{d \alpha}$ has been used to shorten derivative notations.
+%\begin{equation} \left\{
+%\begin{aligned}
+%u_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ \frac{1}{m} (F_{x} - X_a) + vr \right] \\
+%v_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ \frac{F_{y}}{m} - ur \right] \\
+%r_{,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} r_{p}  \\
+%e_{p,\alpha} &= \frac{\norm{\hat{\vec x}_{,\alpha}}}{s_p} \left[ u \sin{e_\psi} + v \cos{e_\psi} \right] \\
+%e_{\psi,\alpha} &= \norm{\hat{\vec x}_{,\alpha}} \left( \frac{r}{s_p} - k \right),
+%\end{aligned} \right.
+%\label{eq:vehicle_state_update_alpha_domain}
+%\end{equation}
+%%
+%where the notation $u_{,\alpha} = \frac{du}{d \alpha}$ has been used to shorten derivative notations.
 
 \begin{figure}[htb] \centering
-%  \subfloat[]
-%    {\includegraphics[width=.5\linewidth]{example-image-a}} % NOTE: this needs `mwe' package
-%  \quad
-  \subfloat[]{\includegraphics[width=.4\linewidth]{scheme_frenet_serret_refsys}
-    \label{fig:scheme_frenet_serret_refsys}}
-  \caption{(\textbf{a}) Something, maybe a vehicle model schematic; (\textbf{b}) vehicle pose respect to the Frenet-Serret reference system identified on the track curve.}
-  \label{fig:scheme_frenet_serret}
+	%  \subfloat[]
+	%    {\includegraphics[width=.5\linewidth]{example-image-a}} % NOTE: this needs `mwe' package
+	%  \quad
+	\subfloat[]{\includegraphics[width=.4\linewidth]{scheme_frenet_serret_refsys}
+		\label{fig:scheme_frenet_serret_refsys}}
+	\caption{(\textbf{a}) vehicle pose respect to the Frenet-Serret reference system identified on the track curve.}
+	\label{fig:scheme_frenet_serret}
 \end{figure}
+
+\subsection{Offset-free MPC}
+
+
+\subsection{Spatial formulation}
+
+
 
 % \subsection{OCP problem formulation}
 
 % The Optimal Control Problem (OCP) is
 
-\subsection{Offset-free MPC}
+
 
 %\textcolor{gray}{\lipsum[4]}
 
