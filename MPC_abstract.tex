@@ -7,11 +7,11 @@
 
 \usepackage{amsmath,amssymb,mathtools}
 
+\usepackage[inline]{enumitem}
+
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
-%
-%\usepackage{lipsum,xcolor} % TODO: remove once fully written
 
 % numbers option provides compact numerical references in the text.
 \usepackage[numbers]{natbib}
@@ -86,34 +86,33 @@ MPC online control problem enhanced in CasADi, a framework written by \citet{And
 
 \section{Introduction}
 
-%\textcolor{gray}{\lipsum[1]}
 
 % ----------------------------------------------------------------------------------------
 
 \section{Proposed approach} % TODO: if the method has a name, use it here as section title
 
-%\textcolor{gray}{\lipsum[2]}
 
-\subsection{Vehicle model}
+\subsection{Model of the simulated vehicle}
 
-%\textcolor{gray}{\lipsum[3]}
-\subsection{MPC Model}
-In order to build an MPC internal model with its own dynamics, and which is as simple as possible, a point mass model is chosen.
-This model has 3 DOF and encloses in itself the fundamental parameters of the driven vehicle as mass, aerodynamic coefficients, grip and power limits for braking and traction phases.
-With this MPC internal model, the optimal control problem is formulated in order to find the optimal control sequence necessary to minimize the travel time of the next N meters of the track. In particular the control inputs of the point mass model are the total longitudinal force $F_{x}$, and the angular acceleration along the $z$-axes $r_p = dr/dt$, where $r$ is the yaw rate.
-The point mass model dynamics is then formulated in spatial domain instead of the time one, and the \textit{direct collocation} is used to transform the OCP into an NLP. The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework~\cite{Andersson2019}, which provides building
-blocks to efficiently formulate and solve large-scale optimization problems, and solved through IPOPT \textbf{cita ipopt}.
 
-Once the problem is solved an optimal control sequence for the steering angle has to be extracted from the NLP solution. In order to do that we use the following formula
+\subsection{MPC internal model}
+
+In order to build an MPC internal model as simple as possible, a point mass model is chosen.
+This model has 5~DOF and encloses in itself the fundamental parameters of the driven vehicle as mass, aerodynamic coefficients, grip and power limits for braking and traction phases.
+
+Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, with $r$ the yaw rate.
+
+The steering angle, needed to control the simulated vehicle, can be extracted by assuming that
 \begin{equation}
 \delta = \alpha_{1} + \beta_1 = F_{y_{11}}/C_\alpha + (v + ra_1)/u
 \end{equation}
-where the notation is based on \textbf{cita Guiggiani}, hence $C_\alpha$ is the cornering stiffness of the front tire, $a_1$ is the distance between the CoM and the front axle, and we assume that the tire slip angles and the vehicle slip angles are equal for the wheels of the same axle, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and  $\beta_{11} = \beta_{12} = \beta_{1}$.
-Furthermore, the lateral force of the front wheels are extimated with a steady state assumption in a way that $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$, where $F_{y}$ is the total lateral force acting on the point mass model, available from the NLP solution, $a_2$ is the distance between the CoM and the rear axle and $l$ is the wheelbase.
+where the notation is based on \textbf{cita Guiggiani}, hence $C_\alpha$ is the cornering stiffness of the front tire, $a_1$ is the distance between the CoM and the front axle.
+Tire slip angles and the vehicle slip angles are assumed equal for the wheels of the same axle, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and  $\beta_{11} = \beta_{12} = \beta_{1}$.
+Furthermore, the lateral force of the front wheels are estimated with a steady state assumption in a way that $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$, where $F_{y}$ is the total lateral force acting on the point mass model, available from the NLP solution, $a_2$ is the distance between the CoM and the rear axle and $l$ is the wheelbase.
 
+\subsection{Spatial formulation}
 
-
-For what concern the race track, it is assumed planar and modelled through the parametric 2D curve
+The race track, assumed planar, is modelled through the parametric 2D curve 
 \begin{equation}
 \mathcal C(\alpha) = \{ \vec x (\alpha) = [x(\alpha), y(\alpha)]^T \in \mathbb{R}^2 : \alpha \in [\alpha_0, \alpha_f] \}
 \end{equation}
@@ -151,25 +150,27 @@ In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Ser
 	\label{fig:scheme_frenet_serret}
 \end{figure}
 
+
+\subsection{OCP problem formulation}
+
+The point mass model dynamics is then formulated in spatial domain instead of the time, and the \emph{direct collocation} is used to transform the \emph{Optimal Control Problem} (OCP) into a \emph{Non-Linear Program} (NLP). The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework written by \citet{Andersson2019}, which provides building
+blocks to efficiently formulate and solve large-scale optimization problems, and solved through IPOPT~\cite{Wachter2006}.
+
 \subsection{Offset-free MPC}
 
+With this model, the optimal control problem is formulated in order to find the optimal control sequence necessary to minimize the travel time of the next $l_N$ meters of the track.
 
-
-
-
-
-% \subsection{OCP problem formulation}
-
-% The Optimal Control Problem (OCP) is
-
-
-
-%\textcolor{gray}{\lipsum[4]}
 
 % ----------------------------------------------------------------------------------------
 
 \section{Preliminary results}
-The MPC controller is tested on Indianapolis oval track racing. In particular, three different simulation are performed: (i) lap-time simulation with MPC controller, (ii) lap-time simulation with MPC controller in which the aerodynamic drag is removed from the model equations, (iii) lap-time simulation with offset-free MPC, where the aerodynamic drag is estimated through the technique explained in \textbf{cita sez. offset-free}.
+The MPC controller is tested on Indianapolis oval track racing. In particular, three different simulation are performed:
+\begin{enumerate*}[label=(\roman*)]
+	\item lap-time simulation with MPC controller,
+	\item lap-time simulation with MPC controller in which the aerodynamic drag is removed from the model equations,
+	\item lap-time simulation with offset-free MPC,
+\end{enumerate*}
+where the aerodynamic drag is estimated through the technique explained in \ref{sec:offsetfree}.
 
 The solutions in terms of trajectories of the real vehicle and controls input provided to it, are shown below, for the entry phase of the first curve. 
 
@@ -199,7 +200,6 @@ Furthermore, the offset-free technique is an helpful and efficient method in ord
 As a future developments of this work, some modifies to the MPC internal model, as a new approach to extract the steer angle, has to be found in order to drive the complex car on its limits. 
 \label{sec:conclusion}
 
-%\textcolor{gray}{\lipsum[6]}
 
 % ----------------------------------------------------------------------------------------
 
