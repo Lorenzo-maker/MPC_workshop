@@ -79,12 +79,26 @@
 % ----------------------------------------------------------------------------------------
 
 \begin{abstract}
-MPC online control problem enhanced in CasADi, a framework written by \citet{Andersson2019}.
+	MPC is often used to control in real time various systems and processes in the 
+	chemical, mechanical and electrical fields. Here we focus on its use in autonomous 
+	driving. In particular, we investigate whether a minimalistic MPC based on a 
+	point mass model is able to drive a complete multibody vehicle model.
+	Then we propose a method, called MPC offset-free, useful to compensate
+	the differences between the MPC internal model and the driven vehicle.
 \end{abstract}
 
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
+Autonomous driving is one of the most discussed and actual topic in research and industrial fields. Here, we focus our attention on autonomous race car. In particular, in literature, three different approaches are employed in order to compute real-time control input for an autonomous car. 
+In the first one the control of the vehicle is realized with a deep dense neural network, which is trained with recorded vehicle data to represent the vehicle's dynamic behaviour \textbf{cita{1-2-3}}. In the second approach a model predictive control (MPC) solves at each sampling instant, a finite horizon open-loop control problem, using the current state of the system as the initial state; the optimization yields an optimal control sequence and the first control in this sequence is applied as an input \textbf{cita{4-5-6}}. The last method is a mix of the previous approaches, in this case a learning model predictive control (LNMPC) is used in order to find optimal control and
+to learn the system model and the disturbance acting on it through the data from the previous trajectories \textbf{cita{7-8-9}}.  
+
+
+In our work, we start from the classical MPC approach, and we employ a minimalistic MPC, hence a very simplified vehicle model is used as MPC internal model in order to reduce computational time. 
+After that the offset-free theory developed in \textbf{cita{Pannocchia}}, is implemented in order to compensate the differences between the MPC model and the driven vehicle. 
+%\textcolor{gray}{\lipsum[1]}
+
 
 
 % ----------------------------------------------------------------------------------------
