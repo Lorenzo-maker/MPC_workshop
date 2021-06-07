@@ -111,32 +111,32 @@ After that the offset-free theory developed in \textbf{cita{Pannocchia}}, is imp
 
 \subsection{MPC internal model}
 
-In order to build an MPC internal model as simple as possible, a point mass model is chosen.
-This model has 5~DOF and encloses in itself the fundamental parameters of the driven vehicle as mass, aerodynamic coefficients, grip and power limits for braking and traction phases.
+In order to race the fully-fledged vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
+This model has 5 DoFs and, worthily enough, it employs the very same basic parameters of the full vehicle, such as: mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
 
-Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, with $r$ the yaw rate.
+Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
 
 The steering angle, needed to control the simulated vehicle, can be extracted by assuming that
 \begin{equation}
 \delta = \alpha_{1} + \beta_1 = F_{y_{11}}/C_\alpha + (v + ra_1)/u
 \end{equation}
-where, exploiting the same notation \citet{Guiggiani2018}, $C_\alpha$ is the cornering stiffness of the front tire and $a_1$ is the distance between the Centre of Mass (CoM) and the front axle.
-Tire slip angles $\alpha_{1i}$ and vehicle slip angles $\beta_{1i}$ are assumed equal in the same axle for each wheel $i=1,2$, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and  $\beta_{11} = \beta_{12} = \beta_{1}$.
+where, exploiting the same notation in~\citet{Guiggiani2018}, $C_\alpha$ is the cornering stiffness of the front tire and $a_1$ is the distance between the Centre of Mass (CoM) and the front axle.
+Tire slip angles $\alpha_{1i}$ and vehicle slip angles $\beta_{1i}$ are assumed equal for each wheel $i=1, 2$ of the same axle, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and $\beta_{11} = \beta_{12} = \beta_{1}$.
 %
-Front wheel lateral forces $F_{y_{1i}}$ are estimated with a steady state assumption, leading to $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$.
-$F_{y}$ summarise the total lateral force that acts on the vehicle model, $a_2$ is the distance between the CoM and the rear axle and $l$ is the wheelbase.
+Front wheel lateral forces $F_{y_{1i}}$ are estimated within the steady-state assumption, leading to $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$.
+$F_{y}$, included as an algebraic state, summarizes the total lateral force acting on the vehicle model. Then, $a_2$ is the distance between the CoM and the rear axle and $l$ is the wheelbase.
 
 \subsection{Spatial formulation}
 
-The race track, assumed planar, is modelled through the parametric 2D curve 
+The race track, assumed planar, is modelled through the parametric 2D curve
 \begin{equation}
 \mathcal C(\alpha) = \{ \vec x (\alpha) = [x(\alpha), y(\alpha)]^T \in \mathbb{R}^2 : \alpha \in [\alpha_0, \alpha_f] \}
 \end{equation}
 %
-that identifies the road centerline, and the 1D curve $\mathcal W(\alpha)$ that specifies the track width.
-With reference to Figure~\ref{fig:scheme_frenet_serret_refsys}, the \emph{curve parameter} $\alpha$ uniquely selects a point $\vec F = \vec x(\alpha)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ whose unit vectors are, respectively, the tangent $\vec t$ and the normal $\vec p$ of the curve $\mathcal C$ in the point $\vec F$.
+that identifies the road centerline (aka track spine), and the 1D curve $\mathcal W(\alpha)$ that specifies the track width.
+With reference to Figure~\ref{fig:scheme_frenet_serret_refsys}, the \emph{curve parameter} $\alpha$ uniquely selects a point $\vec F = \vec x(\alpha)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ with unit tangent and normal vectors $\vec t$ and $\vec p$ of $\mathcal C$ at point $\vec F$.
 %
-The vehicle reference system $\mathcal V = \{ \vec G, (\vec i, \vec j) \}$ can be expressed in terms of the moving frame $\mathcal F$ with a \emph{lateral displacement} $e_p$ along the track normal direction $\vec p$ and the \emph{heading error} $e_\psi$.
+The vehicle reference system $\mathcal V = \{ \vec G, (\vec i, \vec j) \}$ can be expressed with the aid of the moving frame $\mathcal F$ with a \emph{lateral displacement} $e_p$ along the track normal direction $\vec p$ and the \emph{heading error} $e_\psi$.
 % = \psi_f - \psi_v
 In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Serret system has to proceed together with the vehicle: this leads to a relation between vehicle and Frenet-Serret velocities that ultimately imposes a bound between time and $\alpha$ increments.
 
@@ -169,10 +169,10 @@ In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Ser
 
 \subsection{OCP problem formulation}
 
-The point mass model dynamics is formulated in spatial domain instead of the time, and the \emph{direct collocation} is used to transform the \emph{Optimal Control Problem} (OCP) into a \emph{Non-Linear Program} (NLP). The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework written by \citet{Andersson2019}, which provides building
+The centroidal dynamics is formulated in spatial domain instead of the time, and the \emph{direct collocation} is used to transform the \emph{Optimal Control Problem} (OCP) into a \emph{Non-Linear Program} (NLP). The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework written by \citet{Andersson2019}, which provides building
 blocks to efficiently formulate and solve large-scale optimization problems, and solved through IPOPT~\cite{Wachter2006}.
 
-The optimal control problem is formulated in order to find the optimal control sequence necessary to minimize the travel time of the next $l_N$ meters of the track.
+The OCP is formulated with the goal of finding the optimal control sequence necessary to minimize the travel time of the next $l_N$ meters of the track ahead of the vehicle.
 
 \subsection{Offset-free MPC}
 \label{sec:offsetfree}
@@ -181,10 +181,10 @@ The optimal control problem is formulated in order to find the optimal control s
 % ----------------------------------------------------------------------------------------
 
 \section{Preliminary results}
-The MPC controller is tested on Indianapolis oval track racing. In particular, three different simulation are performed:
+The MPC controller is tested on the Indianapolis oval racing track. In particular, three different simulations are performed:
 \begin{enumerate*}[label=(\roman*)]
 	\item lap-time simulation with MPC controller,
-	\item lap-time simulation with MPC controller in which the aerodynamic drag is removed from the model equations,
+	\item lap-time simulation with MPC controller in which the aerodynamic drag is neglected in the MPC internal model,
 	\item lap-time simulation with offset-free MPC,
 \end{enumerate*}
 where the aerodynamic drag is estimated through the technique explained in \ref{sec:offsetfree}.
@@ -203,21 +203,21 @@ Solutions in terms of controlled vehicle trajectories and inputs are compared, f
 	\label{fig:steer_fx}
 \end{figure}
 
-Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC with drag and MPC offset-free are able to drive the Adams vehicle in the same way, with a lap-time difference of $6.5$ms. Instead if the aerodynamic drag is not modelled inside the MPC, the controller is not able to maintain the real vehicle on the track, in fact the simulation failed on the entry phase of the second curve.
+Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC with drag and MPC offset-free are capable to drive the Adams vehicle in a practically identical way, with a lap-time difference of $6.5$ms. Instead, if the aerodynamic drag is not modelled inside the MPC, the controller is not able to maintain the real vehicle on the track: in fact the simulation fails on the entry phase of the second curve.
 
 %\textcolor{gray}{\lipsum[5]}
 
 % ----------------------------------------------------------------------------------------
 
 \section{Conclusion}
-The minimalistic MPC based on a point mass model with its body-fixed reference system is enough to race complex vehicles.
+The minimalistic MPC based solely on the vehicle centroidal dynamics seems enough to race complex vehicle counterpart.
 % NOTE: 'In particular' or 'However'? The following sentence seems a limitation
-In particular, parameters of the MPC model such as mass, aerodynamic coefficients or power limits, have to be equal to those of the driven car: in this way the point mass model can be considered as a condensed model of the complex vehicle itself.
+In particular, parameters of the MPC model such as mass, aerodynamic coefficients or power limits, have to be equal to those of the driven car: in this way the point-mass model can be considered as a condensed model of the complex vehicle itself.
 
-Nevertheless, the offset-free technique is a helpful and efficient method that lets model in a simple way some fundamental characteristics of the complex vehicle.
-As a proof of concept, an internal model not aware of any aerodynamic drag proven to be improved by an estimation of the drag force through the disturbance state $d$.
+Nevertheless, the offset-free technique is a powerful and efficient addendum that allows to relax even further the internal model. It is also forgiving enough to adjust some uncertain yet fundamental parameters of the complex vehicle in a convenient way at run time.
+As a proof of concept, an internal model agnostic of the aerodynamic drag has shown to dramatically benefit from the estimation of the drag force through the disturbance state $d$.
 
-Further modifies to the MPC internal model, as well as new approaches to extract the steer angle, can lead to drive the complex car even more on its limits.
+Further developments to the MPC internal model, as well as new approaches to the estimation of the steer angle, can lead to drive the full vehicle in conditions even closer to handling limits.
 \label{sec:conclusion}
 
 
