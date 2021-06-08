@@ -181,6 +181,12 @@ The OCP is formulated with the goal of finding the optimal control sequence nece
 % ----------------------------------------------------------------------------------------
 
 \section{Preliminary results}
+The overall system is modeled in Matlab-Simulink, where five different macro-blocks are developed. In particular, referring to \ref{fig:simulink_blocks}, we have \textit{Adams \& States Measures} in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation} where we localize through $e_p$ and $e_\psi$ the vehicle respect to the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}, where in the first one necessary data of the track as control point for NURBS \textbf{cita nurbs} representation are calculated, and in the second one the MPC controller finds the optimal control inputs.  
+\begin{figure}[htb] \centering
+	\includegraphics[width=1.\linewidth]{simulink_blocks} 
+	\caption{Simulink model of the simulated system}
+	\label{fig:simulink_blocks}
+\end{figure}
 The MPC controller is tested on the Indianapolis oval racing track. In particular, three different simulations are performed:
 \begin{enumerate*}[label=(\roman*)]
 	\item lap-time simulation with MPC controller,
@@ -188,6 +194,9 @@ The MPC controller is tested on the Indianapolis oval racing track. In particula
 	\item lap-time simulation with offset-free MPC,
 \end{enumerate*}
 where the aerodynamic drag is estimated through the technique explained in \ref{sec:offsetfree}.
+
+For each simulation an horizon length of $l_N = 75$m is chosen and the OCP problem is discretized in $N = 40$ intervals. Hence, having a number of states $n_x = 7$, a number of controls $n_u = 2$ and a number of algebrical variables $n_z = 4$ each optimal control problem has 533 variables, 413 equality constraints and 82 inequality constraints. The solution of these problems on a laptop with 2.30GHz
+Intel(R) Core(TM) i7-10875H CPU and 32 GB di RAM requires a computing time $t_c \simeq 60$ms.
 
 Solutions in terms of controlled vehicle trajectories and inputs are compared, focusing on the entry phase of the first curve.
 
