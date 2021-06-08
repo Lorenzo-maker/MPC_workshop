@@ -132,7 +132,7 @@ The model received two control inputs from the MPC controller: the total longitu
 \subsection{MPC internal model}
 
 In order to race the fully-fledged vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
-This model has 5 DoFs and, worthily enough, it employs the very same basic parameters of the full vehicle, such as: mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
+This model has 5 states and, worthily enough, it employs the very same basic parameters of the full vehicle, such as: mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
 
 Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
 
@@ -154,7 +154,8 @@ The race track, assumed planar, is modelled through the parametric 2D curve
 \end{equation}
 %
 that identifies the road centerline (aka track spine), and the 1D curve $\mathcal W(\alpha)$ that specifies the track width.
-With reference to Figure~\ref{fig:scheme_frenet_serret_refsys}, the \emph{curve parameter} $\alpha$ uniquely selects a point $\vec F = \vec x(\alpha)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ with unit tangent and normal vectors $\vec t$ and $\vec p$ of $\mathcal C$ at point $\vec F$.
+% With reference to Figure~\ref{fig:scheme_frenet_serret_refsys},
+The \emph{curve parameter} $\alpha$ uniquely selects a point $\vec F = \vec x(\alpha)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ with unit tangent and normal vectors $\vec t$ and $\vec p$ of $\mathcal C$ at point $\vec F$.
 %
 The vehicle reference system $\mathcal V = \{ \vec G, (\vec i, \vec j) \}$ can be expressed with the aid of the moving frame $\mathcal F$ with a \emph{lateral displacement} $e_p$ along the track normal direction $\vec p$ and the \emph{heading error} $e_\psi$.
 % = \psi_f - \psi_v
@@ -196,6 +197,25 @@ The OCP is formulated with the goal of finding the optimal control sequence nece
 
 \subsection{Offset-free MPC}
 \label{sec:offsetfree}
+
+An important passage of the proposed work is the attempt to reduce the problem complexity by lightening the vehicle model.
+These unmodeled dynamics can be then considered as external disturbances (linear in the state vector $\vec x$) that act on the system: these disturbances can be estimated and reintroduced on the vehicle dynamics.
+
+As originally proposed by \citet{Pannocchia2015}, a simple method to compensate an unmeasured disturbances is to:
+\begin{enumerate*}[label=(\roman*)]
+	\item model the disturbance,
+	\item use the measurements and model to estimate the disturbance and
+	\item find the inputs that minimise its effect on the controlled variables.
+\end{enumerate*}
+
+The nominal model $\vec x^+=f(\vec x, \vec u)$, assumed observable, is augmented with an estimate of the disturbances acting on the controlled vehicle, called \emph{disturbance state} vector $\vec d$.
+% , written as $\vec x^+=f(\vec x, \vec d, \vec u)$.
+
+Disturbance state dynamics is chosen by considering the zero-offset goal: to achieve offset-free performance against asymptotically constant disturbances, the disturbance state $\vec d$ has an \emph{integrating} evolution, i.e. $\vec d^+ = \vec d$ in discrete time domain.
+The augmented model can be employed to produce, at any sample time, a prediction of the next vehicle state, and once obtained a new vehicle state measure, the disturbance state estimate can be updated.
+
+% \cite{Pannocchia2015} demonstrated that
+If the actual disturbance is both asymptotically constant or slowly varying, a NLP that is based on the augmented model that exploits the proposed disturbance estimate can cope with external disturbances and plant-model mismatches, acting almost like a MPC with a more complex model but with the benefit of improved computational performances.
 
 
 % ----------------------------------------------------------------------------------------
