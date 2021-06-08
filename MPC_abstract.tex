@@ -140,7 +140,7 @@ The steering angle, needed to control the simulated vehicle, can be extracted by
 \begin{equation}
 \delta = \alpha_{1} + \beta_1 = F_{y_{11}}/C_\alpha + (v + ra_1)/u
 \end{equation}
-where, exploiting the same notation in~\citet{Guiggiani2018}, $C_\alpha$ is the cornering stiffness of the front tire and $a_1$ is the distance between the Centre of Mass (CoM) and the front axle.
+where, exploiting the same notation in~\cite{Guiggiani2018}, $C_\alpha$ is the cornering stiffness of the front tire and $a_1$ is the distance between the Centre of Mass (CoM) and the front axle.
 Tire slip angles $\alpha_{1i}$ and vehicle slip angles $\beta_{1i}$ are assumed equal for each wheel $i=1, 2$ of the same axle, hence $\alpha_{11} = \alpha_{12} = \alpha_{1}$ and $\beta_{11} = \beta_{12} = \beta_{1}$.
 %
 Front wheel lateral forces $F_{y_{1i}}$ are estimated within the steady-state assumption, leading to $F_{y_{11}} = F_{y_{12}} = F_{y}a_2/(2l)$.
@@ -176,15 +176,15 @@ In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Ser
 %%
 %where the notation $u_{,\alpha} = \frac{du}{d \alpha}$ has been used to shorten derivative notations.
 
-\begin{figure}[htb] \centering
-	%  \subfloat[]
-	%    {\includegraphics[width=.5\linewidth]{example-image-a}} % NOTE: this needs `mwe' package
-	%  \quad
-	\subfloat[]{\includegraphics[width=.4\linewidth]{scheme_frenet_serret_refsys}
-		\label{fig:scheme_frenet_serret_refsys}}
-	\caption{(\textbf{a}) vehicle pose respect to the Frenet-Serret reference system identified on the track curve.}
-	\label{fig:scheme_frenet_serret}
-\end{figure}
+%\begin{figure}[htb] \centering
+%	%  \subfloat[]
+%	%    {\includegraphics[width=.5\linewidth]{example-image-a}} % NOTE: this needs `mwe' package
+%	%  \quad
+%	\subfloat[]{\includegraphics[width=.4\linewidth]{scheme_frenet_serret_refsys}
+%		\label{fig:scheme_frenet_serret_refsys}}
+%	\caption{(\textbf{a}) vehicle pose respect to the Frenet-Serret reference system identified on the track curve.}
+%	\label{fig:scheme_frenet_serret}
+%\end{figure}
 
 
 \subsection{OCP problem formulation}
