@@ -107,7 +107,17 @@ After that the offset-free theory developed in \textbf{cita{Pannocchia}}, is imp
 
 
 \subsection{Model of the simulated vehicle}
-
+The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of an FSAE car, developed in MSC.Adams by means of the graphical user interface. The parts were built starting form rigid bodies primitives, whereas the elasticities were gathered in the spring-dampers and the anti-roll bars. 
+The resulting mass and inertia of the frame, the engine, the driver, the fuel
+tank, the final transmission etc., evaluated by means of 3D CAD models are
+assigned to the sprung mass in the multibody model.
+The suspension architecture is a classical upper and lower A-arm with push rod both in front and rear wheels instead for the tire model PAC2002 Magic-Formula is used with tire data of Hoosier 20.5x7.0-13.
+The model received from the MPC controller two control inputs, the total longitudinal force $F_{x}$, which divided by two (open differential) and multiplied by the wheel radius is assigned as torque to the rear wheels, and the steering angle $\delta_v$.
+\begin{figure}[htb] \centering
+	\includegraphics[width=0.8\linewidth]{adams_vehicle}
+	\caption{Adams multibody vehicle model}
+	\label{fig:Adams_vehicle}
+\end{figure}
 
 \subsection{MPC internal model}
 
