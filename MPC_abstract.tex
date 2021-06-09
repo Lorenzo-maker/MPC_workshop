@@ -27,6 +27,7 @@
 }
 
 \renewcommand{\baselinestretch}{0.87}
+
 \begin{document}
 
 % TODO: paper title
@@ -80,24 +81,23 @@
 % ----------------------------------------------------------------------------------------
 
 \begin{abstract}
-	MPC is often used to control in real time various systems and processes in the
-	chemical, mechanical and electrical fields. Here we focus on its use in autonomous
-	driving. In particular, we investigate whether a minimalistic MPC based on a
-	point-mass model is able to drive as fast as possible a complete multibody vehicle model.
-	Then we test a methodology, known as \emph{MPC offset-free}, than can cope with disturbances due to differences between the MPC internal model and the driven vehicle.
+	MPC is often used in online control of various systems and processes in the chemical, mechanical and electrical fields.
+	Here its use is focused in autonomous driving.
+	In particular, it is investigated whether a minimalistic MPC based on a point-mass model is able to drive, as fast as possible, a far more complex multibody vehicle model.
+	A methodology, known as \emph{MPC offset-free}, is then tested and proves to be able to represent differences between the MPC internal model and the driven vehicle as disturbances that acts on the minimalistic vehicle model.
 \end{abstract}
 
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-Autonomous driving is one of the most discussed and actual topics both in academia and industry. Here, we focus our attention on autonomous race cars. In the related literature, three different approaches are employed in order to compute real-time control input for an autonomous car.
-In the first one, the control of the vehicle is realized with a deep dense neural network, which is trained with recorded vehicle data to represent the vehicle's dynamic behaviour~\cite{Hermansdorfer2020, Zhu2018, Navarro2018}. In the second approach, a model predictive control (MPC) solves, at each sampling instant, a finite horizon open-loop control problem, using the current state of the system as the initial state; the optimization yields an optimal control sequence and the first control in this sequence is applied as an input~\cite{Liniger2015, Novi2019, Verschueren2014}. The last method is a mix of the previous approaches. Here, a learning model predictive control (LNMPC) is used in order to find optimal control actions and
+Autonomous driving is one of the most discussed and actual topics both in academia and industry.
+% Here, we focus our attention on autonomous race cars.
+In the related literature, three different approaches are employed in order to compute online control inputs for autonomous cars.
+In the first one, the control of the vehicle is achieved by a deep dense neural network, which is trained with recorded vehicle data to represent the vehicle's dynamic behaviour~\cite{Hermansdorfer2020, Zhu2018, Navarro2018}. In the second approach, a model predictive control (MPC) solves, at each sampling instant, a finite horizon open-loop control problem, using the current state of the system as the initial state; the optimization yields an optimal control sequence and the first control in this sequence is applied as an input~\cite{Liniger2015, Novi2019, Verschueren2014}. The last method is a mix of the previous approaches. Here, a learning model predictive control (LNMPC) is used in order to find optimal control actions and
 to learn the system model and the disturbance acting on it through the data from previous trajectories~\cite{Rosolia2016, Brunner2017, Limon2017}.
 
-In our work, starting from the classical MPC approach, we employ a minimalistic MPC, where a very simplified vehicle model is used as the internal model in order to reduce the computational burden.
-We also put on a test the offset-free theory~\cite{Pannocchia2015}, where the internal model dynamics is properly augmented in order to compensate for the differences between the MPC model and the driven vehicle.
-%\textcolor{gray}{\lipsum[1]}
-
+In this work, starting from the classical MPC approach, a minimalistic MPC is employed, where a very simplified vehicle model is used as the internal model in order to reduce the computational burden.
+Offset-free theory~\cite{Pannocchia2015} is put on a test, where the internal model dynamics is properly augmented with a disturbance estimation in order to compensate for the differences between the MPC model and the driven vehicle.
 
 
 % ----------------------------------------------------------------------------------------
@@ -106,21 +106,19 @@ We also put on a test the offset-free theory~\cite{Pannocchia2015}, where the in
 
 
 \subsection{Model of the simulated vehicle}
-The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of an FSAE car, developed in MSC.Adams by means of the graphical user interface. The parts were built starting form rigid bodies primitives whereas the elasticities were gathered in the spring-dampers and the anti-roll bars.
+The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of a Formula SAE car, developed in MSC.Adams by means of the graphical user interface: parts were built starting form rigid bodies primitives, whereas the elasticities were gathered in the spring-dampers and the anti-roll bars.
 
-The mass and inertia of the frame, the engine, the driver, the fuel
-tank and the final transmission, were evaluated by means of 3D CAD models and
-assigned to the sprung mass in the multibody model.
+The mass and inertia of the frame, the engine, the driver, the fuel tank and the final transmission, were evaluated by means of 3D CAD models and assigned to the sprung mass in the multibody model.
 
-The suspension architecture is a classical upper and lower A-arm with push rod both in front and rear wheels. The PAC2002 Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, basing on experimental tests performed on Hoosier 20.5x7.0-13.
+The suspension architecture is a classical upper and lower \emph{A-arm} with push rod both in front and rear wheels. The PAC2002 Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, basing on experimental tests performed on Hoosier 20.5x7.0-13.
 
-The model receives two control inputs from the MPC controller: the steering angle $\delta_v$ and the total longitudinal force $F_{x}$. This is equally distributed to the rear wheels (open differential) in terms of driving torques.
+The model receives two control inputs from the MPC controller: the steering angle $\delta_v$ and the total longitudinal force $F_{x}$. This is equally distributed to the rear wheels (i.e. open differential) in terms of driving torques.
 
 \begin{figure}[htb] \centering
 	
 	\includegraphics[width=0.8\linewidth]{adams_vehicle}
 	
-	\caption{Adams multibody vehicle model}
+	\caption{Adams multibody vehicle model.}
 	
 	\label{fig:Adams_vehicle}
 	
@@ -253,7 +251,6 @@ Solutions in terms of controlled vehicle trajectories and inputs are compared, f
 
 Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC w/ drag and MPC w/o drag + offset-free are capable to drive the MSC.Adams vehicle in a practically identical way, with a lap-time difference of $6.5$ms. Instead, if the aerodynamic drag is not modelled inside the MPC, as in MPC w/o drag, the controller is not able to maintain the real vehicle on the track: in fact the simulation fails on the entry phase of the second curve.
 
-%\textcolor{gray}{\lipsum[5]}
 
 % ----------------------------------------------------------------------------------------
 
