@@ -26,6 +26,7 @@
    /Keywords (Robots;Overlords)
 }
 
+\renewcommand{\baselinestretch}{0.89}
 \begin{document}
 
 % TODO: paper title
@@ -90,13 +91,13 @@
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
-Autonomous driving is one of the most discussed and actual topic in research and industrial fields. Here, we focus our attention on autonomous race car. In particular, in literature, three different approaches are employed in order to compute real-time control input for an autonomous car. 
+Autonomous driving is one of the most discussed and actual topic in research and industrial fields. Here, we focus our attention on autonomous race car. In particular, in literature, three different approaches are employed in order to compute real-time control input for an autonomous car.
 In the first one the control of the vehicle is realized with a deep dense neural network, which is trained with recorded vehicle data to represent the vehicle's dynamic behaviour~\cite{Hermansdorfer2020, Zhu2018, Navarro2018}. In the second approach a model predictive control (MPC) solves at each sampling instant, a finite horizon open-loop control problem, using the current state of the system as the initial state; the optimization yields an optimal control sequence and the first control in this sequence is applied as an input~\cite{Liniger2015, Novi2019, Verschueren2014}. The last method is a mix of the previous approaches, in this case a learning model predictive control (LNMPC) is used in order to find optimal control and
-to learn the system model and the disturbance acting on it through the data from the previous trajectories~\cite{Rosolia2016, Brunner2017, Limon2017}.  
+to learn the system model and the disturbance acting on it through the data from the previous trajectories~\cite{Rosolia2016, Brunner2017, Limon2017}.
 
 
-In our work, we start from the classical MPC approach, and we employ a minimalistic MPC, hence a very simplified vehicle model is used as MPC internal model in order to reduce computational time. 
-After that the offset-free theory developed in~\cite{Pannocchia2015}, is implemented in order to compensate the differences between the MPC model and the driven vehicle. 
+In our work, we start from the classical MPC approach, and we employ a minimalistic MPC, hence a very simplified vehicle model is used as MPC internal model in order to reduce computational time.
+After that the offset-free theory developed in~\cite{Pannocchia2015}, is implemented in order to compensate the differences between the MPC model and the driven vehicle.
 %\textcolor{gray}{\lipsum[1]}
 
 
@@ -221,7 +222,7 @@ If the actual disturbance is both asymptotically constant or slowly varying, a N
 % ----------------------------------------------------------------------------------------
 
 \section{Preliminary results}
-The overall system is modeled in Matlab-Simulink, where five different macro-blocks are developed. In particular, referring to \ref{fig:simulink_blocks}, we have \textit{Adams \& States Measures} in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation} where we localize through $e_p$ and $e_\psi$ the vehicle respect to the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}, where in the first one necessary data of the track as control point for NURBS~\cite{nurbs} representation are calculated, and in the second one the MPC controller finds the optimal control inputs.  
+The overall system is modeled in Matlab-Simulink, where five different macro-blocks are developed. In particular, referring to \ref{fig:simulink_blocks}, we have \textit{Adams \& States Measures} in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation} where we localize through $e_p$ and $e_\psi$ the vehicle respect to the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}, where in the first one necessary data of the track as control point for NURBS~\cite{nurbs} representation are calculated, and in the second one the MPC controller finds the optimal control inputs.
 \begin{figure}[htb] \centering
 	\includegraphics[width=1.\linewidth]{simulink_blocks}
 	\caption{Simulink model of the simulated system}
