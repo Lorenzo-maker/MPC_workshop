@@ -79,9 +79,9 @@
 % ----------------------------------------------------------------------------------------
 
 \begin{abstract}
-	MPC is often used to control in real time various systems and processes in the 
-	chemical, mechanical and electrical fields. Here we focus on its use in autonomous 
-	driving. In particular, we investigate whether a minimalistic MPC based on a 
+	MPC is often used to control in real time various systems and processes in the
+	chemical, mechanical and electrical fields. Here we focus on its use in autonomous
+	driving. In particular, we investigate whether a minimalistic MPC based on a
 	point mass model is able to drive a complete multibody vehicle model.
 	Then we propose a method, called MPC offset-free, useful to compensate
 	the differences between the MPC internal model and the driven vehicle.
@@ -107,9 +107,9 @@ After that the offset-free theory developed in~\cite{Pannocchia2015}, is impleme
 
 
 \subsection{Model of the simulated vehicle}
-The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of an FSAE car, developed in MSC.Adams by means of the graphical user interface. The parts were built starting form rigid bodies primitives whereas the elasticities were gathered in the spring-dampers and the anti-roll bars. 
+The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of an FSAE car, developed in MSC.Adams by means of the graphical user interface. The parts were built starting form rigid bodies primitives whereas the elasticities were gathered in the spring-dampers and the anti-roll bars.
 
-The mass and inertia of the frame, the engine, the driver, the fuel 
+The mass and inertia of the frame, the engine, the driver, the fuel
 tank, the final transmission etc.,  were evaluated by means of 3D CAD models and
 assigned to the sprung mass in the multibody model.
 
@@ -132,7 +132,7 @@ The model received two control inputs from the MPC controller: the total longitu
 \subsection{MPC internal model}
 
 In order to race the fully-fledged vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
-This model has 5 states and, worthily enough, it employs the very same basic parameters of the full vehicle, such as: mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
+This model has 3 DoFs, namely $\alpha$, $e_p$ and $e_{\psi}$ and, worthily enough, it employs the very same basic parameters of the full vehicle, i.e. mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
 
 Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
 
@@ -223,7 +223,7 @@ If the actual disturbance is both asymptotically constant or slowly varying, a N
 \section{Preliminary results}
 The overall system is modeled in Matlab-Simulink, where five different macro-blocks are developed. In particular, referring to \ref{fig:simulink_blocks}, we have \textit{Adams \& States Measures} in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation} where we localize through $e_p$ and $e_\psi$ the vehicle respect to the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}, where in the first one necessary data of the track as control point for NURBS~\cite{nurbs} representation are calculated, and in the second one the MPC controller finds the optimal control inputs.  
 \begin{figure}[htb] \centering
-	\includegraphics[width=1.\linewidth]{simulink_blocks} 
+	\includegraphics[width=1.\linewidth]{simulink_blocks}
 	\caption{Simulink model of the simulated system}
 	\label{fig:simulink_blocks}
 \end{figure}
