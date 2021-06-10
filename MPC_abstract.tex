@@ -92,7 +92,7 @@
 \section{Introduction}
 Autonomous driving is one of the most discussed and actual topics both in academia and industry.
 % Here, we focus our attention on autonomous race cars.
-In the related literature, three different approaches are employed in order to compute online control inputs for autonomous cars.
+In the related literature, mainly three different approaches are employed in order to compute online control inputs for autonomous cars.
 In the first one, the control of the vehicle is achieved by a deep dense neural network, which is trained with recorded vehicle data to represent the vehicle's dynamic behaviour~\cite{Hermansdorfer2020, Zhu2018, Navarro2018}. In the second approach, a model predictive control (MPC) solves, at each sampling instant, a finite horizon open-loop control problem, using the current state of the system as the initial state; the optimization yields an optimal control sequence and the first control in this sequence is applied as an input~\cite{Liniger2015, Novi2019, Verschueren2014}. The last method is a mix of the previous approaches. Here, a learning model predictive control (LNMPC) is used in order to find optimal control actions and
 to learn the system model and the disturbance acting on it through the data from previous trajectories~\cite{Rosolia2016, Brunner2017, Limon2017}.
 
@@ -106,11 +106,11 @@ Offset-free theory~\cite{Pannocchia2015} is put on a test, where the internal mo
 
 
 \subsection{Model of the simulated vehicle}
-The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of a Formula SAE car, developed in MSC.Adams by means of the graphical user interface: parts were built starting form rigid bodies primitives, whereas the elasticities were gathered in the spring-dampers and the anti-roll bars.
+The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody model of a Formula SAE car, developed in MSC.Adams by means of the graphical user interface: parts were built starting form rigid-body primitives, whereas the elasticities were gathered in the spring-dampers and the anti-roll bars.
 
-The mass and inertia of the frame, the engine, the driver, the fuel tank and the final transmission, were evaluated by means of 3D CAD models and assigned to the sprung mass in the multibody model.
+The mass and inertia of the frame, the engine, the driver, the fuel tank and the final transmission were evaluated by means of 3D CAD models and assigned to the sprung mass in the multibody model.
 
-The suspension architecture is a classical upper and lower \emph{A-arm} with push rod both in front and rear wheels. The PAC2002 Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, basing on experimental tests performed on Hoosier 20.5x7.0-13.
+The suspension architecture is a classical upper and lower \emph{A-arm} with push rod both in front and rear wheels. The \texttt{PAC2002} Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, based on experimental tests performed on Hoosier 20.5x7.0-13.
 
 The model receives two control inputs from the MPC controller: the steering angle $\delta_v$ and the total longitudinal force $F_{x}$. This is equally distributed to the rear wheels (i.e. open differential) in terms of driving torques.
 
@@ -128,10 +128,10 @@ The model receives two control inputs from the MPC controller: the steering angl
 
 \subsection{MPC internal model}
 
-In order to race the fully-fledged MSC.Adams vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
-This model has 3 DoFs, namely $\alpha$, $e_p$ and $e_{\psi}$ and, worthily enough, it employs the very same basic parameters of the full vehicle, i.e. mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
+In order to race the full-fledged MSC.Adams vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
+This model has 3 DoFs with respect to the track spine, namely $\alpha$, $e_p$ and $e_{\psi}$ and, worthily enough, it employs the very same basic parameters of the full vehicle, i.e. mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
 
-Control inputs are the longitudinal force $F_{x}$, and the angular acceleration along the vertical axes $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
+Control inputs are the longitudinal force $F_{x}$, and the angular acceleration around the vertical axis $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
 
 The steering angle $\delta_v$, needed to control the simulated vehicle, can be extracted by assuming that
 \begin{equation}
@@ -187,7 +187,7 @@ In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Ser
 
 \subsection{OCP problem formulation}
 
-The centroidal dynamics is formulated in spatial domain instead of time, and the \emph{direct collocation method} is used to transform the \emph{Optimal Control Problem} (OCP) into a \emph{Non-Linear Program} (NLP). The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework written by \cite{Andersson2019}, which provides building
+The centroidal dynamics is formulated in spatial domain instead of time, and the \emph{direct collocation method} is used to transform the \emph{Optimal Control Problem} (OCP) into a \emph{Non-Linear Program} (NLP). The NLP is coded in a scripting environment using the Matlab interface to the open-source CasADi framework~\cite{Andersson2019}, which provides building
 blocks to efficiently formulate and solve large-scale optimization problems, and solved through IPOPT~\cite{Wachter2006}.
 
 The OCP is formulated with the goal of finding the optimal control sequence necessary to minimize the travel time of the next $l_N$ meters of the track ahead of the vehicle.
@@ -198,10 +198,10 @@ The OCP is formulated with the goal of finding the optimal control sequence nece
 An important passage of the proposed work is the attempt to reduce the problem complexity by lightening the vehicle model.
 Unmodeled dynamics are considered as external disturbances (linear in the state vector $\vec x$) that act on the system: these disturbances can be estimated and properly re-introduced into the vehicle dynamics.
 
-As presented by~\citet{Pannocchia2015}, a simple method to compensate unmeasured disturbances is to:
+As presented in~\cite{Pannocchia2015}, a simple method to compensate unmeasured disturbances is to:
 \begin{enumerate*}[label=(\roman*)]
 	\item model the disturbance,
-	\item use the measurements and model to estimate the disturbance and
+	\item use the measurements and the model to estimate the disturbance,
 	\item find the inputs that minimise its effect on the controlled variables.
 \end{enumerate*}
 
@@ -212,13 +212,13 @@ Disturbance state dynamics is chosen by considering the zero-offset goal: to ach
 The augmented model can be employed to produce, at any sample time, a prediction of the next vehicle state and, once a new vehicle state measurement is obtained, the disturbance state estimate can be updated.
 
 % \cite{Pannocchia2015} demonstrated that
-If the actual disturbance is both asymptotically constant or slowly varying, a NLP based on the augmented model exploiting the proposed disturbance estimate can cope with external disturbances and plant-model mismatches, acting almost like an MPC with a more complex model but with the benefit of reduced computational burden.
+If the actual disturbance is both asymptotically constant or slowly varying, a NLP based on the augmented model, exploiting the proposed disturbance estimate, can cope with external disturbances and plant-model mismatches, acting almost like an MPC with a more complex model but with the benefit of reduced computational burden.
 
 
 % ----------------------------------------------------------------------------------------
 
 \section{Preliminary results}
-The overall system is modeled in MATLAB-Simulink, where five different macro-blocks are developed. In particular, referring to \ref{fig:simulink_blocks}, we have \textit{Adams \& States Measures}, in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation}, where we localize through $e_p$ and $e_\psi$ the vehicle on the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}. In the first one, necessary control points of the track for its NURBS~\cite{nurbs} representation are calculated, while in the second one the MPC controller computes the optimal control inputs.
+The overall system is modeled in MATLAB-Simulink, where five different macro-blocks are developed. In particular, with reference to Fig.~\ref{fig:simulink_blocks}, we note: \textit{Adams \& States Measures}, in which the multibody vehicle model is imported and its states are measured; \textit{Lateral Displacement \& Heading Error Estimation}, where we localize through $e_p$ and $e_\psi$ the vehicle on the track; \textit{Track Visualization} necessary to visualize the $l_n$ meters of the track ahead of the vehicle; \textit{MPC Parameters} and \textit{MPC}. In the first one, necessary control points of the track for its NURBS~\cite{nurbs} representation are calculated, while in the second one the MPC controller computes the optimal control inputs.
 \begin{figure}[htb] \centering
 	\includegraphics[width=1.\linewidth]{simulink_blocks}
 	\caption{Simulink model of the simulated system}
@@ -255,7 +255,7 @@ Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC w/ drag a
 % ----------------------------------------------------------------------------------------
 
 \section{Conclusion}
-The minimalistic MPC based solely on the vehicle centroidal dynamics seems enough to race complex vehicle counterpart.
+The minimalistic MPC based solely on the vehicle centroidal dynamics seems enough to race the complex vehicle counterpart.
 % NOTE: 'In particular' or 'However'? The following sentence seems a limitation
 In particular, parameters of the MPC model such as mass, aerodynamic coefficients or power limits, have to be equal to those of the driven car: in this way the point-mass model can be considered as a condensed model of the complex vehicle itself.
 
