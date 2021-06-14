@@ -31,10 +31,10 @@
 \begin{document}
 
 % TODO: paper title
-\title{Is minimalistic MPC based on centroidal dynamics enough to race complex vehicles?}
+\title{Is a minimalistic MPC based on centroidal dynamics enough to race complex vehicles?}
 
 % You will get a Paper-ID when submitting a pdf file to the conference system TODO: update info below
-\author{Author Names Omitted. Paper-ID [add your ID here]}
+\author{Lorenzo Bartali, Michael Mugnai, Francesco Bucchi, Marco Gabiccini}
 
 %\author{\authorblockN{Michael Shell}
 %\authorblockA{School of Electrical and\\Computer Engineering\\
@@ -81,7 +81,7 @@
 % ----------------------------------------------------------------------------------------
 
 \begin{abstract}
-	MPC is often used in online control of various systems and processes in the chemical, mechanical and electrical fields.
+	Model Predictive Control (MPC) is often used in online control of various systems and processes in the chemical, mechanical and electrical fields.
 	Here its use is focused in autonomous driving.
 	In particular, it is investigated whether a minimalistic MPC based on a point-mass model is able to drive, as fast as possible, a far more complex multibody vehicle model.
 	A methodology, known as \emph{MPC offset-free}, is then tested and proves to be able to represent differences between the MPC internal model and the driven vehicle as disturbances that acts on the minimalistic vehicle model.
@@ -110,9 +110,9 @@ The simulated vehicle, shown in Figure~\ref{fig:Adams_vehicle}, is a multibody m
 
 The mass and inertia of the frame, the engine, the driver, the fuel tank and the final transmission were evaluated by means of 3D CAD models and assigned to the sprung mass in the multibody model.
 
-The suspension architecture is a classical upper and lower \emph{A-arm} with push rod both in front and rear wheels. The \texttt{PAC2002} Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, based on experimental tests performed on Hoosier 20.5x7.0-13.
+The suspension architecture is a classical upper and lower \emph{A-arm} with push rod both at front and rear wheels. The \texttt{PAC2002} Magic-Formula is used as tire model, whose parameters were supplied by the Formula SAE Tire Test Consortium, based on experimental tests performed on Hoosier 20.5x7.0-13 tire.
 
-The model receives two control inputs from the MPC controller: the steering angle $\delta_v$ and the total longitudinal force $F_{x}$. This is equally distributed to the rear wheels (i.e. open differential) in terms of driving torques.
+The model receives two control inputs from the MPC controller: the steering angle $\delta_v$ and the total longitudinal force $F_{x}$. This is equally distributed to the rear wheels (i.e. open differential) by imposing the same drive torque at left and right rear wheels.
 
 \begin{figure}[htb] \centering
 	
@@ -129,7 +129,7 @@ The model receives two control inputs from the MPC controller: the steering angl
 \subsection{MPC internal model}
 
 In order to race the full-fledged MSC.Adams vehicle we build an MPC dynamic model from first principles which strives to be as minimalistic as possible for maximum computational efficiency yet able to capture the fundamentals of vehicle dynamics. To this sake, a point-mass model is devised, embodying the dynamics of the center of mass (CoM) of the full model.
-This model has 3 DoFs with respect to the track spine, namely $\alpha$, $e_p$ and $e_{\psi}$ and, worthily enough, it employs the very same basic parameters of the full vehicle, i.e. mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
+This model has 3 DoFs with respect to the track spine and, worthily enough, it employs the very same basic parameters of the full vehicle, i.e. mass, aerodynamic coefficients, grip and power limits for braking and traction phases. These are usually readily available even for a complex vehicle.
 
 Control inputs are the longitudinal force $F_{x}$, and the angular acceleration around the vertical axis $r_p = dr/dt$, where $r$ is the yaw rate~\footnote{It is worth remarking that the apparent nonsense of introducing the yaw rate for a point mass is resolved if one thinks of its dynamics written in the body-fixed reference frame. This justifies the introduction of a yaw rate for the point mass which is the same as the body-fixed reference frame's yaw rate.}.
 
@@ -147,16 +147,16 @@ $F_{y}$, included as an algebraic state, incorporates the total lateral force ac
 
 The race track, assumed planar, is modelled through the parametric 2D curve
 \begin{equation}
-\mathcal C(\alpha) = \{ \vec x (\alpha) = [x(\alpha), y(\alpha)]^T \in \mathbb{R}^2 : \alpha \in [\alpha_0, \alpha_f] \}
+\mathcal C(s) = \{ \vec x (s) = [x(s), y(s)]^T \in \mathbb{R}^2 : s \in [s_0, s_f] \}
 \end{equation}
 %
-that identifies the road centerline (aka track spine), and the 1D curve $\mathcal W(\alpha)$ that specifies the track width.
+that identifies the road centerline (aka track spine), and the 1D curve $\mathcal W(s)$ that specifies the track width.
 % With reference to Figure~\ref{fig:scheme_frenet_serret_refsys},
-The \emph{curve parameter} $\alpha$ uniquely selects a point $\vec F = \vec x(\alpha)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ with unit tangent and normal vectors $\vec t$ and $\vec p$ of $\mathcal C$ at point $\vec F$.
+The \emph{curve parameter} $s$ uniquely selects a point $\vec F = \vec x(s)$ that defines the origin of the \emph{Frenet-Serret frame} $\mathcal F = \{ \vec F, (\vec t, \vec p) \}$ with unit tangent and normal vectors $\vec t$ and $\vec p$ of $\mathcal C$ at point $\vec F$.
 %
 The vehicle reference system $\mathcal V = \{ \vec G, (\vec i, \vec j) \}$ can be expressed with the aid of the moving frame $\mathcal F$ with a \emph{lateral displacement} $e_p$ along the track normal direction $\vec p$ and the \emph{heading error} $e_\psi$.
 % = \psi_f - \psi_v
-In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Serret system has to proceed together with the vehicle: this leads to a relation between vehicle and Frenet-Serret velocities that ultimately imposes a bond between time and $\alpha$ increments.
+In order to maintain $\mathcal F$ side-by-side with $\mathcal V$, the Frenet-Serret system has to move together with the vehicle: this leads to a relation between vehicle and Frenet-Serret velocities that ultimately imposes a bond between time and $s$ increments.
 
 %The final formulation of the vehicle model dynamics, % TODO: ref to standard formulation, if previously exposed
 %extended with lateral displacement, heading error and transposed in spatial domain is
@@ -232,7 +232,7 @@ The MPC controller is tested on the Indianapolis oval racing track. In particula
 \end{enumerate*}
 In the latter, the drag is estimated through the disturbance state technique explained in \ref{sec:offsetfree}.
 
-In each simulation, a receding horizon of length $l_N = 75$m is chosen and the OCP problem is discretized in $N = 40$ intervals. Hence, with a number of states $n_x = 7$, a number of controls $n_u = 2$ and a number of algebrical variables $n_z = 4$, each optimal control problem has 533 variables, 413 equality constraints and 82 inequality constraints. The solution of these problems on a laptop with 2.30GHz
+In each simulation, a receding horizon of length $l_N = 75$m is chosen and the OCP problem is discretized in $N = 40$ intervals. Hence, with a number of states $n_x = 6$, a number of controls $n_u = 2$ and a number of algebrical variables $n_z = 4$, each optimal control problem has 533 variables, 413 equality constraints and 82 inequality constraints. The solution of these problems on a laptop with 2.30GHz
 Intel(R) Core(TM) i7-10875H CPU and 32 GB di RAM requires a computing time $t_c \simeq 60$ms.
 
 Solutions in terms of controlled vehicle trajectories and inputs are compared, focusing on the entry phase of the first curve.
@@ -249,7 +249,7 @@ Solutions in terms of controlled vehicle trajectories and inputs are compared, f
 	\label{fig:steer_fx}
 \end{figure}
 
-Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC w/ drag and MPC w/o drag + offset-free are capable to drive the MSC.Adams vehicle in a practically identical way, with a lap-time difference of $6.5$ms. Instead, if the aerodynamic drag is not modelled inside the MPC, as in MPC w/o drag, the controller is not able to maintain the real vehicle on the track: in fact the simulation fails on the entry phase of the second curve.
+Figures.\ref{fig:Trajectories2} - \ref{fig:steer_fx} highlight how MPC w/ drag and MPC w/o drag + offset-free are capable to drive the MSC.Adams vehicle in a practically identical way, with a lap-time difference of $6.5$ms on a total lap-time of $79.8$s. Instead, if the aerodynamic drag is not modelled inside the MPC, as in MPC w/o drag, the controller is not able to maintain the real vehicle on the track: in fact the simulation fails on the entry phase of the second curve.
 
 
 % ----------------------------------------------------------------------------------------
